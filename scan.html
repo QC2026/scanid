@@ -150,118 +150,88 @@ function toggleTorch(){try{const track=html5QrcodeScanner.getRunningTrack();cons
 async function gantiKamera(){try{await html5QrcodeScanner.stop()}catch{}startCam()}
 
 async function autoSave(){
-  let bagian=localStorage.getItem('bagian')||TYPE;
-  const wib=getWIBDateTime();
-  let tgl_input=wib.tgl_id;
-  let hariIni = wib.tgl_id;
+  let bagian = localStorage.getItem('bagian') || TYPE;
+  const wib = getWIBDateTime();
+  let tgl_input = wib.tgl_id;
+
   try{
-    let all=JSON.parse(localStorage.getItem('riwayat_scan')||'[]');
+    let all = JSON.parse(localStorage.getItem('riwayat_scan')||'[]');
     if(TYPE=='BALL'){
       listBak.forEach(qr=>{
         if(!qr) return;
-        let idx=all.findIndex(d=>d.QR_BAK==qr);
-        if(idx==-1){
-          all.push({ QR_BAK:qr,ID_BALL:res['ID BALL']||'',NO_BOX:res['NO BOX']||'', BAGIAN:bagian,TANGGAL:tgl_input,TGL_CLIENT:wib.tgl_id, JAM_SCAN:wib.jam,JAM_KIRIM:'-', waktu:wib.full_display,TGL_JAM_CLIENT:wib.full_display, status:'Lokal (Pending)' });
-        } else {
-          all[idx].ID_BALL=res['ID BALL']||''; all[idx].NO_BOX=res['NO BOX']||''; all[idx].JAM_SCAN=wib.jam; all[idx].status='Lokal (Pending)';
-        }
+        let idx = all.findIndex(d=>d.QR_BAK==qr);
+        if(idx==-1) all.push({ QR_BAK:qr, ID_BALL:res['ID BALL']||'', NO_BOX:res['NO BOX']||'', BAGIAN:bagian, TANGGAL:tgl_input, TGL_CLIENT:wib.tgl_id, JAM_SCAN:wib.jam, waktu:wib.full_display, status:'Lokal (Pending)' });
+        else { all[idx].ID_BALL=res['ID BALL']||''; all[idx].NO_BOX=res['NO BOX']||''; }
       });
     } else {
-      let qr=res['QR CODE BAK']||'';
-      let idx=all.findIndex(d=>d.QR_BAK==qr && !d.ID_BALL);
-      if(idx==-1){
-        all.push({ QR_BAK:qr,ID_PC:res['ID PC']||'',ID_GL:res['ID GL 1']||'',ID_GL2:res['ID GL 2']||'', ID_KMS:TYPE=='KMS'?res['ID KMS']||'':'',ID_PACK:TYPE=='PACK'?res['ID PACK']||'':'',ID_BDL:TYPE=='BDL'?res['ID BDL']||'':'', JML:res['JML']||'', BAGIAN:bagian,TANGGAL:tgl_input,TGL_CLIENT:wib.tgl_id, JAM_SCAN:wib.jam,JAM_KIRIM:'-', waktu:wib.full_display,TGL_JAM_CLIENT:wib.full_display, status:'Lokal (Pending)' });
-      } else {
+      let qr = res['QR CODE BAK']||'';
+      let idx = all.findIndex(d=>d.QR_BAK==qr && !d.ID_BALL);
+      if(idx==-1) all.push({ QR_BAK:qr, ID_PC:res['ID PC']||'', ID_GL:res['ID GL 1']||'', ID_GL2:res['ID GL 2']||'', ID_KMS:TYPE=='KMS'?res['ID KMS']||'':'', ID_PACK:TYPE=='PACK'?res['ID PACK']||'':'', ID_BDL:TYPE=='BDL'?res['ID BDL']||'':'', JML:res['JML']||'', BAGIAN:bagian, TANGGAL:tgl_input, JAM_SCAN:wib.jam, waktu:wib.full_display, status:'Lokal (Pending)' });
+      else {
         if(TYPE=='KMS') all[idx].ID_KMS=res['ID KMS']||'';
         if(TYPE=='PACK') all[idx].ID_PACK=res['ID PACK']||'';
         if(TYPE=='BDL') all[idx].ID_BDL=res['ID BDL']||'';
         if(TYPE=='BDL') all[idx].JML=res['JML']||'';
-        all[idx].JAM_SCAN=wib.jam; all[idx].status='Lokal (Pending)';
       }
     }
-    localStorage.setItem('riwayat_scan',JSON.stringify(all));
-    localStorage.setItem('riwayat',JSON.stringify(all));
+    localStorage.setItem('riwayat_scan', JSON.stringify(all));
+    localStorage.setItem('riwayat', JSON.stringify(all));
   }catch(err){ alert("Gagal simpen riwayat: "+err); return; }
 
-  if(html5QrcodeScanner){try{await html5QrcodeScanner.stop()}catch(e){}}
+  if(html5QrcodeScanner){ try{ await html5QrcodeScanner.stop() }catch(e){} }
 
-  // === 2. KIRIM KE SHEET - FORMAT SING PASTI DITOMPO doPost ANYAR! ===
-  try {
-    let wib2 = getWIBDateTime();
-    let kirim;
-    if (TYPE == 'BALL') {
-      kirim = {
-        TYPE: 'BALL_8',
-        LIST_BAK: listBak,
-        ID_BALL: res['ID BALL'] || '',
-        NO_BOX: res['NO BOX'] || '',
-        BAGIAN: bagian,
-        TGL_CLIENT: wib2.tgl_id,
-        TGL_JAM_CLIENT: wib2.full_display,
-        JAM_HP: wib2.full_display,
-        TGL_ISO: wib2.iso,
-        JAM_MILIS: wib2.milis,
-        JAM_CLIENT: wib2.jam,
-        TARGET_SHEET: "BALL"
-      };
-    } else if (TYPE == 'BDL') {
-      // === BDL KHUSUS: ID_BDL + JML PASOK! ===
-      kirim = {
-        QR_BAK: res['QR CODE BAK'] || '',
-        ID_BDL: res['ID BDL'] || '',
-        JML: res['JML'] || '',
-        JML_PASOK: res['JML'] || '',
-        BAGIAN: bagian,
-        TGL_CLIENT: wib2.tgl_id,
-        TGL_JAM_CLIENT: wib2.full_display,
-        JAM_HP: wib2.full_display,
-        TGL_ISO: wib2.iso,
-        JAM_MILIS: wib2.milis,
-        JAM_CLIENT: wib2.jam,
-        TYPE: 'BDL',
-        TARGET_SHEET: "BDL"
-      };
-    } else {
-      // GL / KMS / PACK
-      kirim = {
-        QR_BAK: res['QR CODE BAK'] || '',
-        ID_PC: res['ID PC'] || '',
-        ID_GL: res['ID GL 1'] || '',
-        ID_GL2: res['ID GL 2'] || '',
-        ID_KMS: res['ID KMS'] || '',
-        ID_PACK: res['ID PACK'] || '',
-        ID_BDL: res['ID BDL'] || '',
-        BAGIAN: bagian,
-        TGL_CLIENT: wib2.tgl_id,
-        TGL_JAM_CLIENT: wib2.full_display,
-        JAM_HP: wib2.full_display,
-        TGL_ISO: wib2.iso,
-        JAM_MILIS: wib2.milis,
-        JAM_CLIENT: wib2.jam,
-        TYPE: TYPE,
-        TARGET_SHEET: TYPE
-      };
+  // === KIRIM PAKE GET, BEN ORA KEBLOKIR REDIRECT! ===
+  const statusEl = document.getElementById('status');
+  let percobaan = 0;
+
+  // Siapke data kirim per TYPE
+  let daftarKirim = [];
+  if(TYPE=='BALL'){
+    // BALL: kirim 8x, siji-siji! OJO LIST!
+    listBak.forEach(qr=>{
+      daftarKirim.push({ QR_BAK: qr, ID_BALL: res['ID BALL']||'', NO_BOX: res['NO BOX']||'', BAGIAN: 'BALL', TYPE: 'BALL', TGL_CLIENT: wib.tgl_id });
+    });
+  } else {
+    let satu = {
+      QR_BAK: res['QR CODE BAK']||'',
+      ID_PC: res['ID PC']||'',
+      ID_GL: res['ID GL 1']||'',
+      ID_GL2: res['ID GL 2']||'',
+      ID_KMS: res['ID KMS']||'',
+      ID_PACK: res['ID PACK']||'',
+      ID_BDL: res['ID BDL']||'',
+      JML: res['JML']||'',
+      BAGIAN: bagian,
+      TYPE: TYPE,
+      TGL_CLIENT: wib.tgl_id
+    };
+    daftarKirim.push(satu);
+  }
+
+  async function kirimSatu(kirim){
+    percobaan++;
+    if(statusEl) statusEl.innerText = "⏳ MENGIRIM ("+percobaan+"x)... " + wib.full_display;
+    try{
+      let url = GOOGLE_URL + '?' + new URLSearchParams(kirim).toString();
+      // GET + no-cors = lolos redirect, lolos CORS!
+      await fetch(url, { method: 'GET', mode: 'no-cors' });
+      if(statusEl) statusEl.innerText = "✅ TERKIRIM " + wib.full_display;
+      return true;
+    }catch(e){
+      if(statusEl) statusEl.innerText = "⚠️ GAGAL, COBA LAGI 3 DETIK ("+percobaan+"x)";
+      await new Promise(r=>setTimeout(r, 3000));
+      return kirimSatu(kirim);
     }
+  }
 
-    let percobaan = 0;
-    const statusEl = document.getElementById('status');
-    async function autoKirimSampaiMasuk() {
-      percobaan++;
-      if(statusEl) statusEl.innerText = percobaan === 1 ? "⏳ MENGIRIM... " + wib2.full_display : `🔄 COBA LAGI (${percobaan}x)...`;
-      try {
-        const r = await fetch(GOOGLE_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(kirim) });
-        const txt = await r.text();
-        if (r.ok) {
-          if(statusEl) statusEl.innerText = "✅ TERKIRIM " + wib2.full_display;
-          alert('✅ Masuk Sheet '+ TYPE +'! ' + wib2.jam);
-          try{
-            let all2 = JSON.parse(localStorage.getItem('riwayat_scan')||'[]');
-            all2.forEach(d => { if(d.JAM_SCAN == wib2.jam) d.status = 'Terkirim'; });
-            localStorage.setItem('riwayat_scan', JSON.stringify(all2));
-            localStorage.setItem('riwayat', JSON.stringify(all2));
-          }catch(e){}
-          location.href = 'index.html';
-        } else throw new Error();
+  for(let k of daftarKirim){
+    await kirimSatu(k);
+    await new Promise(r=>setTimeout(r, 500)); // jeda 0.5 detik ben ora numpuk
+  }
+
+  alert('✅ Masuk Sheet '+ TYPE +'! ' + wib.jam);
+  location.href = 'index.html';
+} else throw new Error();
       } catch (e) {
         if(statusEl) statusEl.innerText = `⚠️ GAGAL, COBA LAGI 3 DETIK (${percobaan}x)`;
         setTimeout(autoKirimSampaiMasuk, 3000);
@@ -277,7 +247,7 @@ renderSteps();startCam();
 </script>
 <script>
 // AUTO UPDATE V9 - PKJ AUTO UPDATE
-var VERSI_SERVER = "9";
+var VERSI_SERVER = "11";
 var VERSI_HP = localStorage.getItem("VERSI_APP");
 if(VERSI_HP !== VERSI_SERVER){
   localStorage.setItem("VERSI_APP", VERSI_SERVER);
