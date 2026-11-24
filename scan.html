@@ -231,7 +231,8 @@ async function autoSave(){
 
   alert('✅ Masuk Sheet '+ TYPE +'! ' + wib.jam);
   location.href = 'index.html';
-} else throw new Error();
+}  
+else throw new Error();
       } catch (e) {
         if(statusEl) statusEl.innerText = `⚠️ GAGAL, COBA LAGI 3 DETIK (${percobaan}x)`;
         setTimeout(autoKirimSampaiMasuk, 3000);
@@ -246,7 +247,7 @@ updateJamLive();
 renderSteps();startCam();
 </script>
 <script>
-// AUTO UPDATE V9 - PKJ AUTO UPDATE
+// AUTO UPDATE V11 - PKJ AUTO UPDATE
 var VERSI_SERVER = "11";
 var VERSI_HP = localStorage.getItem("VERSI_APP");
 if(VERSI_HP !== VERSI_SERVER){
