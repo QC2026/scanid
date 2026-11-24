@@ -231,8 +231,7 @@ async function autoSave(){
 
   alert('✅ Masuk Sheet '+ TYPE +'! ' + wib.jam);
   location.href = 'index.html';
-}  catch(err){console.error(err);alert("Error:"+err.message);}
-  }
+  
   
 function updateJamLive(){const wib=getWIBDateTime();const el=document.getElementById('jamLive');if(el)el.innerText=wib.tgl_id+' '+wib.jam+' WIB'}
 setInterval(updateJamLive,1000);
