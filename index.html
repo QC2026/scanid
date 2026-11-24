@@ -63,8 +63,25 @@ window.addEventListener('load', autoSync);
 setInterval(autoSync, 15000);
 </script>
   <script>
-// AUTO UPDATE V1 - PKJ AUTO UPDATE
-var VERSI_SERVER = "11";
+// AUTO UPDATE V25  async function kirimSatu(kirim){
+    percobaan++;
+    if(statusEl) statusEl.innerText = "⏳ MENGIRIM ("+percobaan+"x)... " + wib.full_display;
+    try{
+      let url = GOOGLE_URL + '?' + new URLSearchParams(kirim).toString();
+      
+      // ⬇️ GANTI BARIS LAMA DENGAN BARIS INI:
+      await fetch(url, { method: 'GET', mode: 'no-cors', keepalive: true });
+      
+      if(statusEl) statusEl.innerText = "✅ TERKIRIM " + wib.full_display;
+      return true;
+    }catch(e){
+      if(statusEl) statusEl.innerText = "⚠️ GAGAL, COBA LAGI 3 DETIK ("+percobaan+"x)";
+      await new Promise(r=>setTimeout(r, 3000));
+      return kirimSatu(kirim);
+    }
+  }
+ 
+var VERSI_SERVER = "25";
 var VERSI_HP = localStorage.getItem("VERSI_APP");
 if(VERSI_HP !== VERSI_SERVER){
   localStorage.setItem("VERSI_APP", VERSI_SERVER);
