@@ -180,14 +180,14 @@ async function autoSave(){
 
   if(html5QrcodeScanner){ try{ await html5QrcodeScanner.stop() }catch(e){} }
 
-  // === KIRIM PAKE GET, BEN ORA KEBLOKIR REDIRECT! ===
+  // === KIRIM PAKE GET, AGAR TDK KEBLOKIR REDIRECT! ===
   const statusEl = document.getElementById('status');
   let percobaan = 0;
 
   // Siapke data kirim per TYPE
   let daftarKirim = [];
   if(TYPE=='BALL'){
-    // BALL: kirim 8x, siji-siji! OJO LIST!
+    // BALL: kirim 8x, 
     listBak.forEach(qr=>{
       daftarKirim.push({ QR_BAK: qr, ID_BALL: res['ID BALL']||'', NO_BOX: res['NO BOX']||'', BAGIAN: 'BALL', TYPE: 'BALL', TGL_CLIENT: wib.tgl_id });
     });
@@ -208,13 +208,15 @@ async function autoSave(){
     daftarKirim.push(satu);
   }
 
-  async function kirimSatu(kirim){
+    async function kirimSatu(kirim){
     percobaan++;
     if(statusEl) statusEl.innerText = "⏳ MENGIRIM ("+percobaan+"x)... " + wib.full_display;
     try{
       let url = GOOGLE_URL + '?' + new URLSearchParams(kirim).toString();
-      // GET + no-cors = lolos redirect, lolos CORS!
-      await fetch(url, { method: 'GET', mode: 'no-cors' });
+      
+      // ⬇️ GANTI BARIS LAMA
+      await fetch(url, { method: 'GET', mode: 'no-cors', keepalive: true });
+      
       if(statusEl) statusEl.innerText = "✅ TERKIRIM " + wib.full_display;
       return true;
     }catch(e){
@@ -223,6 +225,7 @@ async function autoSave(){
       return kirimSatu(kirim);
     }
   }
+
 
   for(let k of daftarKirim){
     await kirimSatu(k);
@@ -240,8 +243,8 @@ updateJamLive();
 renderSteps();startCam();
 </script>
 <script>
-// AUTO UPDATE V11 - PKJ AUTO UPDATE
-var VERSI_SERVER = "11";
+// AUTO UPDATE V25 - PKJ AUTO UPDATE
+var VERSI_SERVER = "25";
 var VERSI_HP = localStorage.getItem("VERSI_APP");
 if(VERSI_HP !== VERSI_SERVER){
   localStorage.setItem("VERSI_APP", VERSI_SERVER);
