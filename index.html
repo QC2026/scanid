@@ -44,6 +44,24 @@ body{margin:0;background:#080808;color:#ffd700;font-family:sans-serif;padding:12
 </div>
 <div class="btn-keluar" onclick="keluarApp()">❌ KELUAR APLIKASI</div>
 <script>
+  // AUTO HAPUS > 7 HARI - Neng INDEX (soale History nang njero Index)
+(function(){
+  try{
+    let all = JSON.parse(localStorage.getItem('riwayat_scan')||localStorage.getItem('riwayat')||'[]');
+    let batas = Date.now() - (7*24*60*60*1000);
+    let baru = all.filter(d=>{
+      let s = d.TANGGAL || d.waktu || '';
+      if(!s) return true;
+      let t = Date.parse(s);
+      if(isNaN(t)) return true;
+      return t >= batas;
+    });
+    if(baru.length !== all.length){
+      localStorage.setItem('riwayat',JSON.stringify(baru));
+      localStorage.setItem('riwayat_scan',JSON.stringify(baru));
+    }
+  }catch(e){}
+})();
 function go(t){localStorage.setItem('scan_type',t);location.href='scan.html';}
 function keluarApp(){ if(confirm('Yakin mau keluar?')){ try{webintoapp.closeApp();return;}catch(e){} try{Android.closeApp();return;}catch(e){} try{window.close();}catch(e){} } }
 const URL_GAS="https://script.google.com/macros/s/AKfycbwWKvzZzK6Qz9NAWzV43PQIi5URF46WE0ARTuryyXGhJDk-tTmqKXdkcUrXENx6CDweyw/exec";
