@@ -12,25 +12,13 @@ th{background:#333;color:gold;padding:6px}td{padding:6px;border:1px solid #333}
 </style></head><body>
 <button onclick="location.href='index.html'" class="btn btn-black" style="width:auto">← Kembali</button>
 <h3>RIWAYAT - AUTO SYNC</h3>
-<div id="autoInfo" style="background:#222;padding:8px;border-radius:8px;font-size:11px;color:gold;text-align:center">⏳ Cek koneksi...</div>
-<div class="box-bdl">
-  📦 TOTAL SCAN BDL: <b id="jmlBDL">0</b> &nbsp;|&nbsp; 
-  ✅ sudah keisi: <b id="jmlBDL_OK">0</b> &nbsp;|&nbsp; 
-  ⏳ belum: <b id="jmlBDL_KOSONG">0</b>
-</div>
-  
+<div id="autoInfo" style="background:#222;padding:8px;border-radius:8px;font-size:11px;color:gold;text-align:center">⏳ Cek koneksi...</div>  
 <button class="btn btn-gold" onclick="kirimUlang()">🔄 KIRIM MANUAL</button>
 <div id="list" style="margin-top:12px"></div>
 <script>
 const URL_GAS="https://script.google.com/macros/s/AKfycbz-QZefe9rvUl6Q6mXQHZmRgNww_b4PxxfaokevzX1_BchKSBXnGWkRi3I3KZimolrbpA/exec";
 let all=JSON.parse(localStorage.getItem('riwayat_scan')||localStorage.getItem('riwayat')||'[]');
 function tampil(){
- let totalBDL = all.filter(d => d.ID_BDL && d.ID_BDL !== '-' && d.ID_BDL !== '').length;
- let totalQR = all.length;
- let belumBDL = totalQR - totalBDL;
- document.getElementById('jmlBDL').textContent = totalBDL;
- document.getElementById('jmlBDL_OK').textContent = totalBDL;
- document.getElementById('jmlBDL_KOSONG').textContent = belumBDL;
  let h=''; if(all.length==0){h='<p style="text-align:center;color:#666">Belum ada data</p>';}
  else{all.slice().reverse().forEach(d=>{
   let badgeClass=d.STATUS_JEDA=='SAMA HARI'?'sama':'valid'; let badgeText=d.STATUS_JEDA||d.status||'VALID';
