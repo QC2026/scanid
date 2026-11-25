@@ -72,6 +72,24 @@ if ('serviceWorker' in navigator) {
     };
   });
 }
+  // AUTO HAPUS > 7 HARI - Neng INDEX (soale History nang njero Index)
+(function(){
+  try{
+    let all = JSON.parse(localStorage.getItem('riwayat_scan')||localStorage.getItem('riwayat')||'[]');
+    let batas = Date.now() - (7*24*60*60*1000);
+    let baru = all.filter(d=>{
+      let s = d.TANGGAL || d.waktu || '';
+      if(!s) return true;
+      let t = Date.parse(s);
+      if(isNaN(t)) return true;
+      return t >= batas;
+    });
+    if(baru.length !== all.length){
+      localStorage.setItem('riwayat',JSON.stringify(baru));
+      localStorage.setItem('riwayat_scan',JSON.stringify(baru));
+    }
+  }catch(e){}
+})();
 function getWIBDateTime(){
   const now = new Date();
   const fmt = new Intl.DateTimeFormat('en-GB', {
