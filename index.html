@@ -44,11 +44,11 @@ body{margin:0;background:#080808;color:#ffd700;font-family:sans-serif;padding:12
 </div>
 <div class="btn-keluar" onclick="keluarApp()">❌ KELUAR APLIKASI</div>
 <script>
-  // AUTO HAPUS > 7 HARI - Neng INDEX (soale History nang njero Index)
-(function(){
+  // AUTO HAPUS > 2 HARI - di INDEX (soale history di dalam Index)
+  (function(){
   try{
     let all = JSON.parse(localStorage.getItem('riwayat_scan')||localStorage.getItem('riwayat')||'[]');
-    let batas = Date.now() - (7*24*60*60*1000);
+    let batas = Date.now() - (2*24*60*60*1000); // GANTI 7 DADI 2 - 2 DINO PISAN
     let baru = all.filter(d=>{
       let s = d.TANGGAL || d.waktu || '';
       if(!s) return true;
@@ -62,7 +62,7 @@ body{margin:0;background:#080808;color:#ffd700;font-family:sans-serif;padding:12
     }
   }catch(e){}
 })();
-function go(t){localStorage.setItem('scan_type',t);location.href='scan.html';}
+  function go(t){localStorage.setItem('scan_type',t);location.href='scan.html';}
 function keluarApp(){ if(confirm('Yakin mau keluar?')){ try{webintoapp.closeApp();return;}catch(e){} try{Android.closeApp();return;}catch(e){} try{window.close();}catch(e){} } }
 const URL_GAS="https://script.google.com/macros/s/AKfycbwWKvzZzK6Qz9NAWzV43PQIi5URF46WE0ARTuryyXGhJDk-tTmqKXdkcUrXENx6CDweyw/exec";
 async function autoSync(){
@@ -98,8 +98,8 @@ setInterval(autoSync, 15000);
       return kirimSatu(kirim);
     }
   }
- // AUTO UPDATE V31 - PKJ AUTO UPDATE
-var VERSI_SERVER = "31";
+ // AUTO UPDATE V35 - PKJ AUTO UPDATE
+var VERSI_SERVER = "35";
 var VERSI_HP = localStorage.getItem("VERSI_APP");
 if(VERSI_HP !== VERSI_SERVER){
   localStorage.setItem("VERSI_APP", VERSI_SERVER);
