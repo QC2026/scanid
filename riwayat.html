@@ -55,14 +55,28 @@ function tampil(){
  });}
  document.getElementById('list').innerHTML=h;
 }
+ let lagiKirim = false; // KUNCI - ben ora dobel
+
 async function kirimUlang(){
+ if(lagiKirim) return; // Nek lagi ngirim, ojo ngirim meneh!
  if(!navigator.onLine){alert('Nyalakan data dulu '); return;}
+ lagiKirim = true;
  document.getElementById('autoInfo').innerText='⏳ Mengirim...';
- for(let d of all){ if(d.terkirim) continue; try{ await fetch(URL_GAS,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(d),mode:'no-cors'}); d.terkirim=true; d.status='sukses';}catch(e){} }
- localStorage.setItem('riwayat',JSON.stringify(all)); localStorage.setItem('riwayat_scan',JSON.stringify(all));
- document.getElementById('autoInfo').innerText='✅ Selesai auto kirim'; tampil();
+ for(let d of all){ 
+   if(d.terkirim || d.status=='sukses') continue; // Wes sukses, skip!
+   try{ 
+     await fetch(URL_GAS,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(d),mode:'no-cors'}); 
+     d.terkirim=true; 
+     d.status='sukses';
+     // SIMPEN LANGSUNG PER DATA, OJO NUNGGU RAMPUNG KABEH!
+     localStorage.setItem('riwayat',JSON.stringify(all)); 
+     localStorage.setItem('riwayat_scan',JSON.stringify(all));
+   }catch(e){} 
+ }
+ localStorage.setItem('riwayat',JSON.stringify(all)); 
+ localStorage.setItem('riwayat_scan',JSON.stringify(all));
+ document.getElementById('autoInfo').innerText='✅ Selesai auto kirim'; 
+ lagiKirim = false; // BUKA KUNCI
+ tampil();
 }
-window.addEventListener('online', ()=>{ document.getElementById('autoInfo').innerText='📶 Sinyal balik, auto kirim...'; kirimUlang(); });
-window.addEventListener('load', ()=>{ if(navigator.onLine){ let ada=all.some(d=>d.status!='sukses'); if(ada) kirimUlang(); else document.getElementById('autoInfo').innerText='✅ Online - Semua terkirim'; } else document.getElementById('autoInfo').innerText='📴 Offline - Nanti auto kirim pas ada sinyal'; });
-tampil();
 </script></body></html>
