@@ -16,6 +16,23 @@ th{background:#333;color:gold;padding:6px}td{padding:6px;border:1px solid #333}
 <button class="btn btn-gold" onclick="kirimUlang()">🔄 KIRIM MANUAL</button>
 <div id="list" style="margin-top:12px"></div>
 <script>
+ (function(){
+  try{
+    let all = JSON.parse(localStorage.getItem('riwayat_scan')||localStorage.getItem('riwayat')||'[]');
+    let batas = Date.now() - (2*24*60*60*1000); // GANTI 7 DADI 2 - 2 DINO PISAN
+    let baru = all.filter(d=>{
+      let s = d.TANGGAL || d.waktu || '';
+      if(!s) return true;
+      let t = Date.parse(s);
+      if(isNaN(t)) return true;
+      return t >= batas;
+    });
+    if(baru.length !== all.length){
+      localStorage.setItem('riwayat',JSON.stringify(baru));
+      localStorage.setItem('riwayat_scan',JSON.stringify(baru));
+    }
+  }catch(e){}
+})();
 const URL_GAS="https://script.google.com/macros/s/AKfycbz-QZefe9rvUl6Q6mXQHZmRgNww_b4PxxfaokevzX1_BchKSBXnGWkRi3I3KZimolrbpA/exec";
 let all=JSON.parse(localStorage.getItem('riwayat_scan')||localStorage.getItem('riwayat')||'[]');
 function tampil(){
